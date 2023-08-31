@@ -29,7 +29,7 @@ namespace PRS.Controllers
           {
               return NotFound();
           }
-            return await _context.Requests.ToListAsync();
+            return await _context.Requests.Include(x =>x.User).ToListAsync();
         }
 
         // GET: api/Requests/5
@@ -40,8 +40,8 @@ namespace PRS.Controllers
           {
               return NotFound();
           }
-            var request = await _context.Requests.FindAsync(id);
-
+            var request = await _context.Requests.Include(x => x.User).Include(x => x.RequestLines).ThenInclude(x => x.Product).SingleOrDefaultAsync(x => x.Id == id);
+            int i = 1;
             if (request == null)
             {
                 return NotFound();
@@ -143,6 +143,10 @@ namespace PRS.Controllers
                 return BadRequest();
             }
             request.Status = "Rejected";
+            if (request.RejectionReason == null)
+            {
+                return Problem("Must include a rejection Reason!");
+            }
             return await PutRequest(id, request);
         }
         // DELETE: api/Requests/5

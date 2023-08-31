@@ -61,7 +61,7 @@ namespace PRS.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("PRS.Models.Request", b =>
@@ -106,7 +106,7 @@ namespace PRS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Requests");
+                    b.ToTable("Requests", (string)null);
                 });
 
             modelBuilder.Entity("PRS.Models.RequestLine", b =>
@@ -132,7 +132,7 @@ namespace PRS.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("RequestLines");
+                    b.ToTable("RequestLines", (string)null);
                 });
 
             modelBuilder.Entity("PRS.Models.User", b =>
@@ -182,7 +182,7 @@ namespace PRS.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("PRS.Models.Vendor", b =>
@@ -236,7 +236,7 @@ namespace PRS.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Vendors");
+                    b.ToTable("Vendors", (string)null);
                 });
 
             modelBuilder.Entity("PRS.Models.Product", b =>
