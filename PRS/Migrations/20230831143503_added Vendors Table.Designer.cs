@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRS.Data;
 
@@ -10,9 +11,11 @@ using PRS.Data;
 namespace PRS.Migrations
 {
     [DbContext(typeof(PRSContext))]
-    partial class PRSContextModelSnapshot : ModelSnapshot
+    [Migration("20230831143503_added Vendors Table")]
+    partial class addedVendorsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,49 +23,6 @@ namespace PRS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PRS.Models.Product", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("PartNbr")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("PhotoPath")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(11,2)");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<int>("VendorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PartNbr")
-                        .IsUnique();
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("Products");
-                });
 
             modelBuilder.Entity("PRS.Models.User", b =>
                 {
@@ -166,17 +126,6 @@ namespace PRS.Migrations
                         .IsUnique();
 
                     b.ToTable("Vendors");
-                });
-
-            modelBuilder.Entity("PRS.Models.Product", b =>
-                {
-                    b.HasOne("PRS.Models.Vendor", "Vendor")
-                        .WithMany()
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vendor");
                 });
 #pragma warning restore 612, 618
         }
