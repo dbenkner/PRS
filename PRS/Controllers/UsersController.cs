@@ -8,12 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using PRS.Data;
 using PRS.Models;
 
+
+
 namespace PRS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        public static int UserSignedIn;
         private readonly PRSContext _context;
 
         public UsersController(PRSContext context)
@@ -61,6 +64,7 @@ namespace PRS.Controllers
             {
                 return NotFound();
             }
+            UserSignedIn = user.Id;
             return user;
         }
 

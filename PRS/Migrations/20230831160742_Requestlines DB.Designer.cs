@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRS.Data;
 
@@ -10,9 +11,11 @@ using PRS.Data;
 namespace PRS.Migrations
 {
     [DbContext(typeof(PRSContext))]
-    partial class PRSContextModelSnapshot : ModelSnapshot
+    [Migration("20230831160742_Requestlines DB")]
+    partial class RequestlinesDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
