@@ -49,6 +49,20 @@ namespace PRS.Controllers
 
             return request;
         }
+        [HttpGet("reviews/{userId}")]
+        public async Task<ActionResult<IEnumerable<Request>>> GetReviews(int userId)
+        {
+            if (_context.Requests == null)
+            {
+                return NotFound();
+            }
+            var requests = await _context.Requests.Where(x => (x.UserId != userId) && (x.Status == "Review")).ToListAsync();
+            if (requests == null)
+            {
+                return NotFound();
+            }
+            return requests;
+        }
 
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -81,6 +95,7 @@ namespace PRS.Controllers
             return NoContent();
         }
 
+
         // POST: api/Requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -96,7 +111,40 @@ namespace PRS.Controllers
 
             return CreatedAtAction("GetRequest", new { id = request.Id }, request);
         }
-
+        [HttpPut("approve/{id}")]
+        public async Task<IActionResult> SetApproved(int id, Request request)
+        {
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+            request.Status = "APPROVED";
+            return await PutRequest(id, request);
+        }
+        [HttpPut("review/{id}")]
+        public async Task<IActionResult> SetReview(int id, Request request)
+        {
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+            if (request.Total < 50)
+            {
+                return await SetApproved(id, request);
+            }
+            request.Status = "REVIEW";
+            return await PutRequest(id, request);
+        }
+        [HttpPut("reject/{Id}")]
+        public async Task<IActionResult> SetRejected(int id, Request request)
+        {
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+            request.Status = "Rejected";
+            return await PutRequest(id, request);
+        }
         // DELETE: api/Requests/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)

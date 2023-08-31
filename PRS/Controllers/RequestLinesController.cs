@@ -91,6 +91,10 @@ namespace PRS.Controllers
           {
               return Problem("Entity set 'PRSContext.RequestLines'  is null.");
           }
+          if (requestLine.Quantity <= 0)
+            {
+                return Problem("Quantity MUST BE AT LEAST 1!");
+            }
             _context.RequestLines.Add(requestLine);
             await _context.SaveChangesAsync();
 
