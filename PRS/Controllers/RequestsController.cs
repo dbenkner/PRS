@@ -105,7 +105,8 @@ namespace PRS.Controllers
           {
               return Problem("Entity set 'PRSContext.Requests'  is null.");
           }
-            request.UserId = UsersController.UserSignedIn;
+           // var usersignedIn = UsersController.UserSignedIn;
+           // request.UserId = usersignedIn;
             _context.Requests.Add(request);
             await _context.SaveChangesAsync();
 
@@ -142,7 +143,7 @@ namespace PRS.Controllers
             {
                 return BadRequest();
             }
-            request.Status = "Rejected";
+            request.Status = "REJECTED";
             if (request.RejectionReason == null)
             {
                 return Problem("Must include a rejection Reason!");

@@ -36,7 +36,7 @@ namespace PRS.Controllers
                               RlTotals = rl.Quantity * p.Price
                           }).Sum(x => x.RlTotals);
             var request = await _context.Requests.FindAsync(id);
-            request.Total = result;
+            request!.Total = result;
             await _context.SaveChangesAsync();
         }
 
@@ -80,7 +80,7 @@ namespace PRS.Controllers
             }
 
             _context.Entry(requestLine).State = EntityState.Modified;
-                      if (requestLine.Quantity <= 0)
+            if (requestLine.Quantity <= 0)
             {
                 return Problem("Quantity MUST BE AT LEAST 1!");
             }
