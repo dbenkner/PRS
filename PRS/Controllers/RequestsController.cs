@@ -56,7 +56,7 @@ namespace PRS.Controllers
             {
                 return NotFound();
             }
-            var requests = await _context.Requests.Where(x => (x.UserId != userId) && (x.Status == "Review")).ToListAsync();
+            var requests = await _context.Requests.Where(x => (x.UserId != userId) && (x.Status == "Review")).Include(x => x.User).ToListAsync();
             if (requests == null)
             {
                 return NotFound();
@@ -129,7 +129,7 @@ namespace PRS.Controllers
             {
                 return BadRequest();
             }
-            if (request.Total < 50)
+            if (request.Total <= 50)
             {
                 return await SetApproved(id, request);
             }

@@ -16,7 +16,6 @@ namespace PRS.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        public static int UserSignedIn;
         private readonly PRSContext _context;
 
         public UsersController(PRSContext context)
@@ -64,7 +63,6 @@ namespace PRS.Controllers
             {
                 return NotFound();
             }
-            UserSignedIn = user.Id;
             return user;
         }
 
@@ -110,7 +108,6 @@ namespace PRS.Controllers
           }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
@@ -137,6 +134,14 @@ namespace PRS.Controllers
         private bool UserExists(int id)
         {
             return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+        private bool UsernameExists(User user)
+        {
+            if (_context.Users.Where(x => x.Username == user.Username).SingleOrDefaultAsync().ToString() == user.Username)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -19,5 +19,15 @@ namespace PRS.Data
         public DbSet<Product> Products { get; set; } = default!;
         public DbSet<Request> Requests { get; set; } = default!;
         public DbSet<RequestLine> RequestLines { get; set; } = default!;
+
+        public PRSContext() { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if(!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("server=localhost\\sqlexpress;database=PRSdb;trusted_connection=true;trustServerCertificate=true;");
+            }
+        }
     }
 }
