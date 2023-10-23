@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,59 @@ namespace PRS.Controllers
             }
 
             return vendor;
+        }
+
+        //GET: api/Vendors/po/1
+        [HttpGet("po/{vendorId}")]
+        public async Task<ActionResult<Po>> CreatePo(int vendorId)
+        {
+            if (_context.Vendors == null)
+            {
+                return NotFound();
+            }
+            var vendor = await _context.Vendors.FindAsync(vendorId);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+            Po po = new Po();
+            po.Vendor = vendor;
+            List<Poline> polines = new List<Poline>();
+
+            var lines = (from p in _context.Products
+                          join l in _context.RequestLines on
+                          p.Id equals l.ProductId
+                          join r in _context.Requests on
+                          l.RequestId equals r.Id
+                         where p.VendorId == vendorId && r.Status == "APPROVED"
+                          select new
+                          {
+                              p.Id,
+                              Product = p.Name,
+                              l.Quantity,
+                              p.Price,
+                              LineTotal = p.Price * l.Quantity
+                          });
+            var sortedLines = new SortedList<int, Poline>();
+            foreach(var line in lines)
+            {
+                if (!sortedLines.ContainsKey(line.Id))
+                {
+                    var poline = new Poline()
+                    {
+                        Product = line.Product,
+                        Quantity = 0,
+                        Price = line.Price,
+                        LineTotal = line.LineTotal
+                    };
+                    sortedLines.Add(line.Id, poline);
+                }
+                sortedLines[line.Id].Quantity += line.Quantity;
+            }
+            po.Polines = sortedLines.Values;
+            po.PoTotal = po.Polines.Sum(x => x.LineTotal);
+            return po;
+
         }
 
         // PUT: api/Vendors/5
