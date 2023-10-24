@@ -66,7 +66,6 @@ namespace PRS.Controllers
             }
             Po po = new Po();
             po.Vendor = vendor;
-            List<Poline> polines = new List<Poline>();
 
             var lines = (from p in _context.Products
                           join l in _context.RequestLines on
@@ -101,7 +100,6 @@ namespace PRS.Controllers
             po.Polines = sortedLines.Values;
             po.PoTotal = po.Polines.Sum(x => x.LineTotal);
             return po;
-
         }
 
         // PUT: api/Vendors/5
