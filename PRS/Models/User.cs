@@ -9,8 +9,10 @@ namespace PRS.Models
         public int Id { get; set; }
         [StringLength(30)]
         public string Username { get; set; } = string.Empty;
-        [StringLength(30)]
-        public string Password { get; set; } = string.Empty;
+        [StringLength(255)]
+        public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
+        [StringLength(255)]
+        public byte[] PasswordHash { get; set;} = Array.Empty<byte>();
         [StringLength(30)]
         public string Firstname { get; set; } = string.Empty;
         [StringLength(30)]

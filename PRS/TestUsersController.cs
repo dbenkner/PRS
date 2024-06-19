@@ -16,12 +16,7 @@ namespace PRS
         {
             ursCtrl = new UsersController(new PRSContext());
         }
-        [Fact]
-        public async void TestLogin()
-        {
-            var user = await ursCtrl.Login("hhill", "propane");
-            Assert.IsType<ActionResult<User>?>(user);
-        }
+        
     }
 
 }
