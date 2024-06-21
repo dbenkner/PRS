@@ -19,6 +19,8 @@ namespace PRS.Data
         public DbSet<Product> Products { get; set; } = default!;
         public DbSet<Request> Requests { get; set; } = default!;
         public DbSet<RequestLine> RequestLines { get; set; } = default!;
+        public DbSet<Role> Roles { get; set; } = default!;
+        public DbSet<UserRole> UsersRoles { get; set; } = default!;
 
         public PRSContext() { }
 

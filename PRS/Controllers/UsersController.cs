@@ -4,12 +4,14 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PRS.Data;
 using PRS.DTOs;
 using PRS.Models;
+using PRS.Services;
 
 
 
@@ -28,6 +30,7 @@ namespace PRS.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [Authorize(Roles = "user")]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
           if (_context.Users == null)
@@ -39,13 +42,14 @@ namespace PRS.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize(Roles ="user")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
           if (_context.Users == null)
           {
               return NotFound();
           }
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users.Include(u => u.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(u => u.Id == id);    
 
             if (user == null)
             {
@@ -54,7 +58,7 @@ namespace PRS.Controllers
 
             return user;
         }
-        /*
+        /* DEPRECATED LOGIN
         [HttpGet("{username}/{password}")]
         public async Task<ActionResult<User>> Login(string username, string password)
         {
@@ -74,6 +78,7 @@ namespace PRS.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id != user.Id)
@@ -111,6 +116,7 @@ namespace PRS.Controllers
           {
               return Problem("Entity set 'PRSContext.User'  is null.");
           }
+            if (await _context.Users.AnyAsync(u => u.Username == newUserDTO.Username)) return BadRequest("Username Exists");
             using HMAC hmac = new HMACSHA512();
             User user = new User()
             {
@@ -124,13 +130,20 @@ namespace PRS.Controllers
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            var userRole = new UserRole()
+            {
+                RoleID = 3,
+                UserID = user.Id
+            };
+            _context.UsersRoles.Add(userRole);
+            await _context.SaveChangesAsync();
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
         [HttpPost("login")]
-        public async Task<ActionResult<User>> LoginUser(LoginDTO loginDTO)
+        public async Task<ActionResult<User>> LoginUser(AuthService service, LoginDTO loginDTO)
         {
             if (_context.Users == null) { return Problem("Entity set is null"); }
-            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDTO.Username);
+            User? user = await _context.Users.Include(u => u.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(x => x.Username ==  loginDTO.Username);    
             if (user == null) return Unauthorized("Invalid Login"); 
             using HMAC hmac = new HMACSHA512(user.PasswordSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
@@ -138,11 +151,21 @@ namespace PRS.Controllers
             {
                 if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Login");
             }
+            
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(1),
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict
+            };
+            Response.Cookies.Append("Token", service.Create(user), cookieOptions);
+            
             return Ok(user);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (_context.Users == null)
@@ -152,7 +175,7 @@ namespace PRS.Controllers
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound($"User with ID {id} not found");
             }
 
             _context.Users.Remove(user);
@@ -165,9 +188,9 @@ namespace PRS.Controllers
         {
             return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-        private bool UsernameExists(User user)
+        private async Task<bool> UsernameExists(string username)
         {
-            if (_context.Users.Where(x => x.Username == user.Username).SingleOrDefaultAsync().ToString() == user.Username)
+            if (await _context.Users.AnyAsync(u => u.Username == username)) 
             {
                 return true;
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,6 +16,7 @@ namespace PRS.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RequestLinesController : ControllerBase
     {
         private readonly PRSContext _context;

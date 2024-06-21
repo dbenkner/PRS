@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PRS.Models
 {
@@ -10,8 +11,10 @@ namespace PRS.Models
         [StringLength(30)]
         public string Username { get; set; } = string.Empty;
         [StringLength(255)]
+        [JsonIgnore]
         public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
         [StringLength(255)]
+        [JsonIgnore]
         public byte[] PasswordHash { get; set;} = Array.Empty<byte>();
         [StringLength(30)]
         public string Firstname { get; set; } = string.Empty;
@@ -20,8 +23,8 @@ namespace PRS.Models
         [StringLength(12)]
         public string? Phone { get; set; } = string.Empty;
         [StringLength(255)]
+        [EmailAddress]
         public string? Email { get; set; } = string.Empty;
-        public bool IsReviewer { get; set; }
-        public bool IsAdmin { get; set; } 
+        public virtual List<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

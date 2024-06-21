@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRS.Data;
 
@@ -10,9 +11,11 @@ using PRS.Data;
 namespace PRS.Migrations
 {
     [DbContext(typeof(PRSContext))]
-    partial class PRSContextModelSnapshot : ModelSnapshot
+    [Migration("20240620195150_user roles")]
+    partial class userroles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,7 +152,7 @@ namespace PRS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("PRS.Models.User", b =>
@@ -221,7 +224,7 @@ namespace PRS.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("UsersRoles");
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("PRS.Models.Vendor", b =>

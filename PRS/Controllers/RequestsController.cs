@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace PRS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RequestsController : ControllerBase
     {
         private readonly PRSContext _context;
@@ -113,6 +115,7 @@ namespace PRS.Controllers
             return CreatedAtAction("GetRequest", new { id = request.Id }, request);
         }
         [HttpPut("approve/{id}")]
+        [Authorize(Roles = "reviewer")]
         public async Task<IActionResult> SetApproved(int id, Request request)
         {
             if (id != request.Id)
@@ -123,6 +126,7 @@ namespace PRS.Controllers
             return await PutRequest(id, request);
         }
         [HttpPut("review/{id}")]
+        [Authorize(Roles = "reviewer")]
         public async Task<IActionResult> SetReview(int id, Request request)
         {
             if (id != request.Id)
@@ -137,6 +141,7 @@ namespace PRS.Controllers
             return await PutRequest(id, request);
         }
         [HttpPut("reject/{Id}")]
+        [Authorize(Roles = "reviewer")]
         public async Task<IActionResult> SetRejected(int id, Request request)
         {
             if (id != request.Id)
