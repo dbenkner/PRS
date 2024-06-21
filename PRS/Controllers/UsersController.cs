@@ -116,6 +116,7 @@ namespace PRS.Controllers
           {
               return Problem("Entity set 'PRSContext.User'  is null.");
           }
+            if (!ValidationService.ValidEmail(newUserDTO.Email)) return BadRequest("Invalid Email");
             if (await _context.Users.AnyAsync(u => u.Username == newUserDTO.Username)) return BadRequest("Username Exists");
             using HMAC hmac = new HMACSHA512();
             User user = new User()
@@ -146,7 +147,7 @@ namespace PRS.Controllers
             User? user = await _context.Users.Include(u => u.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(x => x.Username ==  loginDTO.Username);    
             if (user == null) return Unauthorized("Invalid Login"); 
             using HMAC hmac = new HMACSHA512(user.PasswordSalt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
+            byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
             for(var i = 0; i < computedHash.Length; i++)
             {
                 if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Login");

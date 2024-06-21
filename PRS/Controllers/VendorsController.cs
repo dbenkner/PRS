@@ -7,14 +7,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using PRS.Data;
 using PRS.Models;
+using PRS.Services;
 
 namespace PRS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize("user")]
     public class VendorsController : ControllerBase
     {
         private readonly PRSContext _context;
@@ -144,6 +146,7 @@ namespace PRS.Controllers
           {
               return Problem("Entity set 'PRSContext.Vendors'  is null.");
           }
+          if(!ValidationService.ValidEmail(vendor.Email)) return BadRequest(new {Message = $"{vendor.Email} is an invalid email address"});
             _context.Vendors.Add(vendor);
             await _context.SaveChangesAsync();
 
