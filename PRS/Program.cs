@@ -13,8 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 var connStrKey = "ProdDb";
+var orgins = builder.Configuration["AllowedOrgins:ProdOrgin"];
 #if DEBUG
     connStrKey="DevDb";
+    orgins = builder.Configuration["AllowedOrgins:DevOrgin"];
 #endif
 
 builder.Services.AddDbContext<PRSContext>(options =>
@@ -69,7 +71,9 @@ intialiser.Run();
 
 // Configure the HTTP request pipeline.
 
-app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()); //Will be changed when running on the server
+int i =0;
+
+app.UseCors(x => x.WithOrigins(orgins).AllowAnyHeader().AllowAnyMethod().AllowCredentials()); //Will be changed when running on the server
 app.UseAuthentication();
 
 app.UseAuthorization();

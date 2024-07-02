@@ -163,7 +163,23 @@ namespace PRS.Controllers
             
             return Ok(user);
         }
-
+        [HttpPost("Resetpassword/{id}")]
+        public async Task<ActionResult<User>> ResetPassword(ResetPasswordDTO resetPasswordDTO, int id)
+        {
+            if (id <= 0) return BadRequest();
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null) return NotFound();
+            using HMAC oldPass = new HMACSHA512(user.PasswordSalt);
+            byte[] computedHash = oldPass.ComputeHash(Encoding.UTF8.GetBytes(resetPasswordDTO.OldPassword));
+            for (var i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Login");
+            }
+            using HMAC hmac = new HMACSHA512();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(resetPasswordDTO.NewPassword));
+            user.PasswordSalt = hmac.Key;
+            return Ok(user);
+        }
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
